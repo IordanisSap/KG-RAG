@@ -24,6 +24,5 @@ generation:
       Do NOT mention that you were given any data or information in your response. 
       You are given the following data:
 
-  # model: llama3.1:8b
-  model: llama3.2
+  model: llama3.1:8b
   temperature: 0
