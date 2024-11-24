@@ -12,4 +12,4 @@
 4. Modify the [config.yaml](app/chatbot//config.yaml) if needed
 
 # Run examples
-python -m unittest .\examples\example.py
+python3 -m unittest ./examples/example.py 
