@@ -1,6 +1,7 @@
 from .ingestion.ingest import Ingestor
 from .retrieval.retriever import Retriever
 from .generation.generator import Generator
+from .config import Config
 
 import yaml
 import os
@@ -8,11 +9,13 @@ import os
 
 
 with open(os.path.join(os.path.dirname(__file__), "config.yaml"), "r") as f:
-    config = yaml.safe_load(f)
+    config_yaml = yaml.safe_load(f)
+    config = Config(config_yaml)
+    
 
-ingestionConfig = config["ingestion"]
-retrivalConfig = config["retrieval"]
-generationConfig = config["generation"]
+ingestionConfig = config.config["ingestion"]
+retrivalConfig = config.config["retrieval"]
+generationConfig = config.config["generation"]
 
 ingestor = Ingestor(ingestionConfig["embedding-model"], ingestionConfig["persist-dir"])
 retriever = Retriever(retrivalConfig)
@@ -22,6 +25,11 @@ generator = Generator(generationConfig)
 #     vectorstore = ingestor.ingest_pdfs(ingestionConfig["dataset-dir"])
 # else:
 #     vectorstore = ingestor.get_vectorstore()
+
+def update_config(new_config):
+    print(config.config)
+    config.update(new_config)
+    print(config.config)
     
 def ingest_documents(dataset_dir):
     return ingestor.ingest_pdfs(dataset_dir)
