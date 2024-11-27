@@ -1,11 +1,13 @@
-from src.KG_RAG import ingest_documents, generate, generate_rag, generate_kgrag
+from src.KG_RAG import RAGAgent
 
-res, docs = generate_rag("One sentence about palm trees?")
+
+agent = RAGAgent()
+res, docs = agent.generate_rag("One sentence about palm trees?")
 print(res, f" (Retrieved documents: {len(docs)})")
 
-ingest_documents("examples/datasets/MarineRestorationAnalysis")
+agent.index_documents("examples/datasets/MarineRestorationAnalysis")
 
-print(generate("One sentence about palm trees?"))
+print(agent.generate("One sentence about palm trees?"))
 
-res, docs = generate_rag("One sentence about palm trees?")
+res, docs = agent.generate_rag("One sentence about palm trees?")
 print(res, f" (Retrieved documents: {len(docs)})")
