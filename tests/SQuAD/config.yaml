@@ -1,0 +1,9 @@
+generation:
+  prompts:
+    system: Respond to all questions in a concise and direct manner
+      You are given a question and some context. 
+      You must only answer if the answer can be inferred according to the given text, 
+      else your response must be completely empty and contain no characters.
+
+  model: llama3.1:8b
+  temperature: 0

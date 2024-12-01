@@ -6,9 +6,6 @@ from .config import Config
 import yaml
 import os
 
-
-
-
     
 default_config_path = os.path.join(os.path.dirname(__file__), "config.yaml")
 
@@ -54,17 +51,3 @@ class RAGAgent:
         return self.generator.generate(retrieval_text + "\n" + prompt), retrieved_docs
         
         
-# def update_config(new_config):
-#     rag_manager.update_config(new_config)
-
-# def index_documents(dataset_dir):
-#     return rag_manager.index_documents(dataset_dir)
-
-# def generate(prompt):
-#     return rag_manager.generate(prompt)
-
-# def generate_rag(prompt):
-#     return rag_manager.generate_rag(prompt)
-
-# def generate_kgrag(prompt):
-#     return rag_manager.generate_kgrag(prompt)
