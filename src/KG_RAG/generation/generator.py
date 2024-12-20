@@ -14,6 +14,5 @@ class Generator:
             SystemMessage(self.config["prompts"].get("system", None)),
             HumanMessage(prompt)
         ]
-        
         response = self.model.invoke(messages)
         return response
