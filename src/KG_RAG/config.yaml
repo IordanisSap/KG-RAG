@@ -2,7 +2,7 @@ ingestion:
   embedding-model: nomic-embed-text
   persist-dir: examples/vectorstore
   # persist-dir: /mnt/10TB/iordanissapidis/datasets/vectorstore
-  dataset-dir: examples/datasets/MarineRestorationAnalysis # uncomment to index a new dataset
+  # dataset-dir: examples/datasets/MarineRestorationAnalysis # uncomment to index a new dataset
   # dataset-dir: /mnt/10TB/iordanissapidis/datasets/large
 
 retrieval:

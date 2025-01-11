@@ -23,15 +23,15 @@ class RAGAgent:
         retrieval_config = self.config.config["retrieval"]
         generation_config = self.config.config["generation"]
 
-        self.ingestor = Ingestor(ingestion_config["embedding-model"], ingestion_config["persist-dir"])
+        self.ingestor = Ingestor(ingestion_config["embedding-model"])
         self.retriever = Retriever(retrieval_config)
         self.generator = Generator(generation_config)
         
-    def index_documents(self, dataset_dir):
-        return self.ingestor.ingest_pdfs(dataset_dir)
+    def index_documents(self, dataset_dir, persist_dir):
+        return self.ingestor.ingest_pdfs(dataset_dir, persist_dir)
     
-    def retrieve(self, prompt, topk, score_threshold):
-        return self.retriever.retrieve(prompt, topk, score_threshold)
+    def retrieve(self, prompt, persist_dir, topk, score_threshold):
+        return self.retriever.retrieve(prompt, persist_dir, topk, score_threshold)
 
     def generate(self, prompt):
         return self.generator.generate(prompt)
