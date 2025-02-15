@@ -3,7 +3,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from ..utils import log
 
 class Splitter:
-    def __init__(self, chunk_size=600, chunk_overlap=0):
+    def __init__(self, chunk_size=500, chunk_overlap=50):
         self.text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=chunk_size, chunk_overlap=chunk_overlap, add_start_index=True
         )

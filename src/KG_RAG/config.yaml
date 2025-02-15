@@ -15,13 +15,36 @@ retrieval:
 
 generation:
   prompts:
+    triples: >
+      You are a highly intelligent language model trained to extract information from text in the form of triples (subject, predicate, object). A triple consists of three components:
+      
+      Subject: The entity or concept that the statement is about.
+      Predicate: The action, relationship, or property that connects the subject and object.
+      Object: The entity, concept, or value related to the subject. Given any text, you must only output a list of triples in this format: (subject, predicate, object). Avoid adding any explanations, commentary, or extra information.
+      Here are examples:
+
+      Example 1
+      Input Text: "Marie Curie discovered radium in 1898." Output Triples:
+
+      (Marie Curie, discovered, radium)
+      (Radium, discovered in, 1898)
+      Example 2
+      Input Text: "The Eiffel Tower is located in Paris and was built in 1889." Output Triples:
+
+      (Eiffel Tower, is located in, Paris)
+      (Eiffel Tower, was built in, 1889)
+      Example 3
+      Input Text: "Albert Einstein developed the theory of relativity." Output Triples:
+
+      (Albert Einstein, developed, theory of relativity)
+      Now, extract triples from the following text.
+      
     system: "Respond to all questions in a concise and direct manner"
 
     # Low quality/irrelevant/noisy data
     rag_prompt: >
-      Answer according to your knowledge and, if needed, the given facts. 
-      If the data is irrelevant, ignore it and answer according to your knowledge.
-      Do NOT mention that you were given any data or information in your response. 
+      Examine all the provided data carefully and answer according to the given data. 
+      If the data is completely irrelevant,you must mention that no relevant data are provided and answer according to your knowledge.
       You are given the following data:
 
   model: llama3.1:8b

@@ -38,7 +38,7 @@ class RAGAgent:
 
     def generate_rag(self, prompt, retrieval_config=None):
         if retrieval_config:
-            params = {"topk", "score_threshold"}
+            params = {"persist_dir", "topk", "score_threshold"}
             filtered_config = {param: val for param, val in retrieval_config.items() if param in params}
             retrieved_docs = self.retriever.retrieve(prompt, **filtered_config) 
         else: retrieved_docs = self.retriever.retrieve(prompt)
@@ -51,16 +51,19 @@ class RAGAgent:
     
     def generate_kgrag(self, prompt, retrieval_config=None):
         if retrieval_config:
-            params = {"topk", "score_threshold"}
+            params = {"persist_dir", "topk", "score_threshold"}
             filtered_config = {param: val for param, val in retrieval_config.items() if param in params}
             retrieved_docs = self.retriever.retrieve(prompt, **filtered_config) 
         else: retrieved_docs = self.retriever.retrieve(prompt)
         if not retrieved_docs:
             return self.generator.generate(prompt), retrieved_docs
         
-        rag_prompt = config_yaml["prompts"].get("rag_prompt", None)
-        retrieval_text = rag_prompt + ".\n" + " ".join(list(map(lambda x: x.page_content, retrieved_docs)))
-        retrieval_text += "Finish your response with 'Powered by KG-RAG'"
+        rag_prompt = config_yaml["generation"]["prompts"].get("rag_prompt", None)
+        retrieval_text = rag_prompt + ".\n" + " ".join(doc.page_content for doc in retrieved_docs)
         return self.generator.generate(retrieval_text + "\n" + prompt), retrieved_docs
-        
+    
+    def generate_triples(self, text):
+        triples_prompt = config_yaml["generation"]["prompts"].get("triples", None)
+        return self.generator.generate(triples_prompt + "\n" + text)
+
         
