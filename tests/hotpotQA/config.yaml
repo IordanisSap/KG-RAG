@@ -1,0 +1,10 @@
+generation:
+  prompts:
+    system: >
+      Respond to all questions in a concise and direct manner. 
+      Use the provided data to answer the question. 
+      Most of the data may be irrelevant so you must only take into account those that are relevant for answring the question. 
+      Be as brief as possible in your answers (e.g. 'yes', 'no', '1900' etc.)"
+
+  model: llama3.1:8b-instruct-q8_0
+  temperature: 0

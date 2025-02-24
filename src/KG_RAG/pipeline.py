@@ -63,7 +63,20 @@ class RAGAgent:
         return self.generator.generate(retrieval_text + "\n" + prompt), retrieved_docs
     
     def generate_triples(self, text):
-        triples_prompt = config_yaml["generation"]["prompts"].get("triples", None)
-        return self.generator.generate(triples_prompt + "\n" + text)
-
+        named_entities_prompt = config_yaml["generation"]["prompts"].get("ner", None)
+        named_entities = self.generator.generate(named_entities_prompt + "\n" + text)
+        named_entities_triples_prompt = config_yaml["generation"]["prompts"].get("ner_triples", None)
+        return self.generator.generate(named_entities_triples_prompt + "\n" + text +"\n named entities: " + named_entities)
+        # triples_ner_prompt = config_yaml["generation"]["prompts"].get("ner_triples", None)
+        # triples_prompt = config_yaml["generation"]["prompts"].get("triples", None)
+        # return self.generator.generate(triples_prompt + "\n" + text)
         
+    def coreference_resolution(self, text):
+        coref_resolution_prompt = config_yaml["generation"]["prompts"].get("coreference_resolution", None)
+        return self.generator.generate(coref_resolution_prompt + "\n" + text)
+    
+    
+    def get_similarity(self, text1, text2):
+        return self.retriever.get_similarity(text1, text2)
+        
+
