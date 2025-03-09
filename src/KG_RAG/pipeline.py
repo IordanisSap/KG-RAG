@@ -3,6 +3,7 @@ from .retrieval.retriever import Retriever
 from .generation.generator import Generator
 from .config import Config
 
+import json
 import yaml
 import os
 
@@ -23,7 +24,7 @@ class RAGAgent:
         retrieval_config = self.config.config["retrieval"]
         generation_config = self.config.config["generation"]
 
-        self.ingestor = Ingestor(ingestion_config["embedding-model"])
+        self.ingestor = Ingestor(ingestion_config)
         self.retriever = Retriever(retrieval_config)
         self.generator = Generator(generation_config)
         
@@ -57,7 +58,7 @@ class RAGAgent:
         else: retrieved_docs = self.retriever.retrieve(prompt)
         if not retrieved_docs:
             return self.generator.generate(prompt), retrieved_docs
-        
+
         rag_prompt = config_yaml["generation"]["prompts"].get("rag_prompt", None)
         retrieval_text = rag_prompt + ".\n" + " ".join(doc.page_content for doc in retrieved_docs)
         return self.generator.generate(retrieval_text + "\n" + prompt), retrieved_docs
@@ -66,7 +67,8 @@ class RAGAgent:
         named_entities_prompt = config_yaml["generation"]["prompts"].get("ner", None)
         named_entities = self.generator.generate(named_entities_prompt + "\n" + text)
         named_entities_triples_prompt = config_yaml["generation"]["prompts"].get("ner_triples", None)
-        return self.generator.generate(named_entities_triples_prompt + "\n" + text +"\n named entities: " + named_entities)
+        raw_triples = self.generator.generate(named_entities_triples_prompt + "\n" + text +"\n named entities: " + named_entities)
+        return json.loads(raw_triples)["triples"]
         # triples_ner_prompt = config_yaml["generation"]["prompts"].get("ner_triples", None)
         # triples_prompt = config_yaml["generation"]["prompts"].get("triples", None)
         # return self.generator.generate(triples_prompt + "\n" + text)

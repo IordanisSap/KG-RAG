@@ -1,7 +1,5 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-from ..utils import log
-
 class Splitter:
     def __init__(self, chunk_size=500, chunk_overlap=50):
         self.text_splitter = RecursiveCharacterTextSplitter(
@@ -9,14 +7,9 @@ class Splitter:
         )
 
     def split_documents(self, docs):
-        chunks = []
-        for i,doc in enumerate(docs):
-            splits = self.text_splitter.split_documents(doc)
-            log(f"({i+1}/{len(docs)}) Splitting document into {len(splits)} chunks")
-            # Add metadata to each chunk
-            for split in splits:
-                split.metadata['title'] = 'Paper Title'
-            chunks.extend(splits)
+        chunks = self.text_splitter.split_documents(docs)  # Process all docs at once
+        for chunk in chunks:
+            chunk.metadata['title'] = chunk.metadata.get('title', 'Unknown Title')  # Preserve metadata if exists
         return chunks
 
 

@@ -1,22 +1,16 @@
+import logging
+import sys
 
+logging.basicConfig(stream=sys.stdout, level=logging.INFO, format="%(message)s")
 
-def log(text: str, level: str = "INFO"):
-    """
-    Log a message to the console.
-
-    Args:
-        text: The message to log.
-        level: The level of the log message. Default is "INFO".
-    """
-    print(f"[{level}] {text}")
-    
-    
-    
-def call_in_batches(func, array, batch_size=1):
+def call_in_batches(func, array, batch_size=1, log_every=10):
     result = []
-    for i in range(0, len(array), batch_size):
+    total = len(array)
+
+    for i in range(0, total, batch_size):
         batch = array[i:i + batch_size]
         tmp = func(batch)
         result.extend(tmp)
-        log(f"({min((i+batch_size), len(array))}/{len(array)})")
+        if (i // batch_size) % log_every == 0 or i + batch_size >= total:
+            logging.info(f"Processed {min(i + batch_size, total)}/{total}")
     return result

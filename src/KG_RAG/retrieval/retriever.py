@@ -15,10 +15,13 @@ class Retriever:
         if score_threshold is None:
             score_threshold = self.config["score-threshold"]
         if persist_dir is None:
-            persist_dir = os.listdir(self.config["persist-dir"])[0]
-        database_path = os.path.join(self.config["persist-dir"], persist_dir)
+            persist_dir = self.config["persist-dir"]
+            
+        vectorstore_dir = os.path.join(persist_dir, self.config["vectorstore-dir"])
+        bm25_dir = os.path.join(persist_dir, self.config["bm25-dir"])
+        
         vectorstore = Chroma(                                                                                            # DB is reloaded every time to be up to date and allow
-            persist_directory=database_path, embedding_function=OllamaEmbeddings(model=self.config["embedding-model"]))  # for custom directory. TODO Improve it in the future
+            persist_directory=vectorstore_dir, embedding_function=OllamaEmbeddings(model=self.config["embedding-model"]))  # for custom directory. TODO Improve it in the future
         
         retriever = vectorstore.as_retriever(
             search_type="similarity_score_threshold", search_kwargs={"k": topk , "score_threshold": score_threshold})

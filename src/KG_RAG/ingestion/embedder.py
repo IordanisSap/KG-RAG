@@ -1,13 +1,14 @@
 from langchain_chroma import Chroma
 from langchain_ollama import OllamaEmbeddings
-from ..utils import call_in_batches, log
+from ..utils import call_in_batches
+import logging
 
 class Embedder:
     def __init__(self, model: str):
         self.model = model
 
     def index_embeddings(self, text_chunks, persist_dir):
-        log("Indexing embeddings")
+        logging.info("Indexing embeddings")
         
         vectorstore = Chroma(
             collection_metadata={"hnsw:space": "cosine"},

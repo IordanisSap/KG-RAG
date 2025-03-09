@@ -1,15 +1,17 @@
 ingestion:
   embedding-model: nomic-embed-text
-  persist-dir: examples/vectorstore
-  # persist-dir: /mnt/10TB/iordanissapidis/datasets/vectorstore
-  # dataset-dir: examples/datasets/MarineRestorationAnalysis # uncomment to index a new dataset
-  # dataset-dir: /mnt/10TB/iordanissapidis/datasets/large
+  persist-dir: examples/example1/retrieval_store
+  bm25-dir: bm25
+  vectorstore-dir: vectorstore
+  # dataset-dir: examples/datasets/MarineRestorationAnalysis # To index a new dataset
 
 retrieval:
   topk: 5
   score-threshold: 0.4
   embedding-model: nomic-embed-text
-  persist-dir: examples/vectorstore
+  persist-dir: examples/example1/retrieval_store
+  bm25-dir: bm25
+  vectorstore-dir: vectorstore
 
 
 

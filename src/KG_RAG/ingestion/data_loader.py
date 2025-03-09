@@ -1,18 +1,31 @@
 
 import os
 from langchain_community.document_loaders.pdf import PyPDFLoader
-
-from ..utils import log
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+import logging
 
 class DataLoader:
-    def load_pdfs(self, dir: str):
+    def load_pdfs(self, dir_path: str):
+        dir_path = Path(dir_path)
+        pdf_files = list(dir_path.glob("*.pdf"))
+        
+        if not pdf_files:
+            logging.warning("No PDF files found in the directory.")
+            return []
+        
         documents = []
-        pdf_files = [file for file in os.listdir(dir) if file.endswith(".pdf")]
-        for i,file in enumerate(pdf_files):
-                log("({0}/{1}) Loading {2}".format(i + 1,len(pdf_files),file))
-                file_path = os.path.join(dir, file)
-                doc = PyPDFLoader(file_path).load()
-                documents.append(doc)
+        
+        def load_single_pdf(file_path):
+            logging.info(f"Loading {file_path.name}")
+            return PyPDFLoader(str(file_path)).load()
+        
+        with ThreadPoolExecutor() as executor:
+            results = executor.map(load_single_pdf, pdf_files)
+        
+        for doc in results:
+            documents.extend(doc)
+
         return documents
 
 
