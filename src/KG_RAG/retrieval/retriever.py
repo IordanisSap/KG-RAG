@@ -3,10 +3,12 @@ from langchain_ollama import OllamaEmbeddings
 import os
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
+from .fulltext import BM25Retriever
 
 class Retriever:
     def __init__(self, config):
         self.config = config
+        self.bm25_retriever = BM25Retriever(config)
 
 
     def retrieve(self, prompt: str, persist_dir=None, topk=None, score_threshold=None):
@@ -27,7 +29,9 @@ class Retriever:
             search_type="similarity_score_threshold", search_kwargs={"k": topk , "score_threshold": score_threshold})
         retrieved_docs = retriever.invoke(prompt)
         
-        return retrieved_docs
+        bm25_docs = self.bm25_retriever.retrieve(prompt, bm25_dir)
+        
+        return retrieved_docs + bm25_docs
     
     def get_similarity(self, text1, text2):
         embeddings_model = OllamaEmbeddings(model=self.config["embedding-model"])

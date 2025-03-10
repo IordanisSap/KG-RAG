@@ -1,5 +1,4 @@
 
-import os
 from langchain_community.document_loaders.pdf import PyPDFLoader
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
