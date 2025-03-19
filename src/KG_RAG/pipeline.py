@@ -29,7 +29,7 @@ class RAGAgent:
         self.generator = Generator(generation_config)
         
     def index_documents(self, dataset_dir, persist_dir):
-        return self.ingestor.ingest_pdfs(dataset_dir, persist_dir)
+        return self.ingestor.ingest(dataset_dir, persist_dir)
     
     def retrieve(self, prompt, persist_dir, topk, score_threshold):
         return self.retriever.retrieve(prompt, persist_dir, topk, score_threshold)
@@ -80,5 +80,6 @@ class RAGAgent:
     
     def get_similarity(self, text1, text2):
         return self.retriever.get_similarity(text1, text2)
+    
         
 

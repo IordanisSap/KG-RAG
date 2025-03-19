@@ -8,6 +8,7 @@ ingestion:
 retrieval:
   topk: 5
   score-threshold: 0.4
+  bm25-threshold: 1
   embedding-model: nomic-embed-text
   persist-dir: examples/example1/retrieval_store
   bm25-dir: bm25

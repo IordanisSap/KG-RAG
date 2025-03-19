@@ -31,7 +31,9 @@ class Retriever:
         
         bm25_docs = self.bm25_retriever.retrieve(prompt, bm25_dir)
         
-        return retrieved_docs + bm25_docs
+        left_docs = topk - len(retrieved_docs)
+        
+        return retrieved_docs + bm25_docs[0:left_docs]
     
     def get_similarity(self, text1, text2):
         embeddings_model = OllamaEmbeddings(model=self.config["embedding-model"])

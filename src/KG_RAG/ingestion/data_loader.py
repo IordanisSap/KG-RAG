@@ -3,28 +3,62 @@ from langchain_community.document_loaders.pdf import PyPDFLoader
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 import logging
+from langchain_community.document_loaders.csv_loader import CSVLoader
+import csv
 
 class DataLoader:
-    def load_pdfs(self, dir_path: str):
+    def __init__(self, csv_args=None):
+        self.csv_args = csv_args or {}
+
+        self.loaders = {
+            "pdf": PyPDFLoader,
+            "csv": lambda file_path: load_csv_with_auto_header(file_path)
+        }
+
+    def load(self, dir_path: str):
         dir_path = Path(dir_path)
-        pdf_files = list(dir_path.glob("*.pdf"))
-        
-        if not pdf_files:
-            logging.warning("No PDF files found in the directory.")
+        if not dir_path.exists() or not dir_path.is_dir():
+            raise ValueError(f"Provided path '{dir_path}' is not a valid directory.")
+
+        files = {ext: list(dir_path.glob(f"*.{ext}")) for ext in self.loaders}
+        files_to_load = [(file, ext) for ext, file_list in files.items() for file in file_list]
+
+        if not files_to_load:
+            logging.warning("No supported files found in the directory.")
             return []
-        
+
         documents = []
-        
-        def load_single_pdf(file_path):
+
+        def load_file(file_info):
+            file_path, ext = file_info
             logging.info(f"Loading {file_path.name}")
-            return PyPDFLoader(str(file_path)).load()
-        
+            return self.loaders[ext](str(file_path)).load()
+
         with ThreadPoolExecutor() as executor:
-            results = executor.map(load_single_pdf, pdf_files)
-        
+            results = executor.map(load_file, files_to_load)
+
         for doc in results:
             documents.extend(doc)
 
         return documents
 
 
+
+def load_csv_with_auto_header(file_path):
+    with open(file_path, "r", newline="", encoding="utf-8") as f:
+        # sample = f.read(1024)
+        # sniffer = csv.Sniffer()
+        # has_header = sniffer.has_header(sample) #TODO Implement this in a better way, currently it is buggy and doesnt work due to quotes
+        has_header = False
+        
+    csv_args = {}
+    if (not has_header):
+        with open(file_path, "r", newline="", encoding="utf-8") as f:
+            reader = csv.reader(f)
+            first_row = next(reader)
+            num_columns = len(first_row)
+            fieldnames = [f"column_{i}" for i in range(num_columns)]
+            csv_args = {'fieldnames': fieldnames}
+            
+    logging.info(f"Loading {file_path} (Detected Header: {has_header})")
+    return CSVLoader(file_path, csv_args=csv_args)
