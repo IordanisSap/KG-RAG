@@ -18,15 +18,6 @@ retrieval:
 
 generation:
   prompts:
-    ner_question: >
-      You are a very effective entity extraction system. Please extract all named entities that are important for
-      solving the questions below. Place the named entities in JSON format following the provided example
-
-      Example question: Which magazine was started first Arthur’s Magazine or First for Women?
-      {"named_entities": ["First for Women", "Arthur’s Magazine"]}
-
-      Question: 
-
     ner: >
       You are a very effective entity extraction system. Please extract all named entities in the following passage.
       Place the named entities in JSON format following the provided example
@@ -78,47 +69,6 @@ generation:
           ["PlanetRadiocity.com", "genre", "news"],
           ["PlanetRadiocity.com", "genre", "videos"],
           ["PlanetRadiocity.com", "genre", "songs"]
-        ]
-      }
-
-      Question:
-    
-
-    ner_triples2: >
-      Your task is to construct an RDF (Resource Description Framework) graph from the given passages and
-      named entity lists.
-      Respond with a JSON list of triples, with each triple representing a relationship in the RDF graph.
-      Pay attention to the following requirements:
-      - Each triple should contain at least one, but preferably two, of the named entities in the list for each
-      passage.
-      - Clearly resolve pronouns to their specific names to maintain clarity.
-      Convert the paragraph into a JSON dict, it has a named entity list and a triple list.
-      Please generate as many triples as possible, even if redundant. Pay very close attention to not omit any triples at all.
-
-      Example input:
-      Radio City
-      Radio City is India’s first private FM radio station and was started on 3 July 2001. It plays Hindi, English
-      and regional songs. Radio City recently forayed into New Media in May 2008 with the launch of a music
-      portal - PlanetRadiocity.com that offers music related news, videos, songs, and other music-related
-      features.
-      {"named_entities": ["Radio City", "India", "3 July 2001", "Hindi","English", "May 2008", "PlanetRadiocity.com"]}
-      
-      Example output:
-      {"triples":
-        [
-          ["Radio City", "located in", "India"],
-          ["Radio City", "is", "private"]
-          ["Radio City", "is", "FM radio station"],
-          ["Radio City", "started on", "3 July 2001"],
-          ["Radio City", "plays songs in", "Hindi"],
-          ["Radio City", "plays songs in", "English"],
-          ["Radio City", "forayed into", "New Media"],
-          ["Radio City", "launched", "PlanetRadiocity.com"],
-          ["PlanetRadiocity.com", "launched in", "May 2008"],
-          ["PlanetRadiocity.com", "is", "music portal"],
-          ["PlanetRadiocity.com", "offers", "news"],
-          ["PlanetRadiocity.com", "offers", "videos"],
-          ["PlanetRadiocity.com", "offers", "songs"]
         ]
       }
 

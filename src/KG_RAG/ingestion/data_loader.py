@@ -5,6 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 import logging
 from langchain_community.document_loaders.csv_loader import CSVLoader
 import csv
+from KG_RAG.utils import benchmark
 
 class DataLoader:
     def __init__(self, csv_args=None):
@@ -15,6 +16,7 @@ class DataLoader:
             "csv": lambda file_path: load_csv_with_auto_header(file_path)
         }
 
+    @benchmark
     def load(self, dir_path: str):
         dir_path = Path(dir_path)
         if not dir_path.exists() or not dir_path.is_dir():
@@ -57,7 +59,7 @@ def load_csv_with_auto_header(file_path):
             reader = csv.reader(f)
             first_row = next(reader)
             num_columns = len(first_row)
-            fieldnames = [f"column_{i}" for i in range(num_columns)]
+            fieldnames = [f"c_{i}" for i in range(num_columns)]
             csv_args = {'fieldnames': fieldnames}
             
     logging.info(f"Loading {file_path} (Detected Header: {has_header})")

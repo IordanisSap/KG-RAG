@@ -8,18 +8,26 @@ class BM25Retriever:
     def __init__(self, config):
         self.config = config
         self.stemmer = Stemmer.Stemmer("english")
-        self.retriever = bm25s.BM25()
 
-    def retrieve(self, query, persist_dir):
-        retriever = bm25s.BM25.load(persist_dir, load_corpus=True)
+    def retrieve(self, query, index):
         query_tokens = bm25s.tokenize(query, stemmer=self.stemmer)
-        results, scores = retriever.retrieve(query_tokens, k=5)
+        results, scores = index.retrieve(query_tokens, k=5)
         for i in range(results.shape[1]):
             doc, score = results[0, i], scores[0, i]
-            print(f"{i+1}: (score: {score:.2f}): {doc["id"]}")
 
         return [
             Document(result["text"], metadata={
-                    "source": "BM25 - NO URL", "page": "1"})
+                    "source": "BM25 - NO URL", "page": "1", "id": result["id"]})
             for result, score in zip(results[0, :], scores[0, :]) if score > 1
         ]
+
+    def load(self, persist_dir):
+        return bm25s.BM25.load(persist_dir, load_corpus=True)
+    
+    def retrieve_persist(self, query, persist_dir):
+        try: 
+            index = bm25s.BM25.load(persist_dir, load_corpus=True)
+            return self.retrieve(query, index)
+        except FileNotFoundError:
+            print(f'BM25 index not found in {persist_dir} , ensure the correct persist_dir is provided')
+            return []

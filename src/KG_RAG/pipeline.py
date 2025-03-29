@@ -2,6 +2,7 @@ from .ingestion.ingest import Ingestor
 from .retrieval.retriever import Retriever
 from .generation.generator import Generator
 from .config import Config
+from .utils import benchmark
 
 import json
 import yaml
@@ -28,40 +29,57 @@ class RAGAgent:
         self.retriever = Retriever(retrieval_config)
         self.generator = Generator(generation_config)
         
-    def index_documents(self, dataset_dir, persist_dir):
-        return self.ingestor.ingest(dataset_dir, persist_dir)
+    def index_documents(self, dataset_dir, persist_dir=None):
+        return self.ingestor.ingest_documents(dataset_dir, persist_dir)
     
-    def retrieve(self, prompt, persist_dir, topk, score_threshold):
-        return self.retriever.retrieve(prompt, persist_dir, topk, score_threshold)
+    def index_text(self, text_chunks, persist_dir=None):
+        return self.ingestor.ingest_text(text_chunks, persist_dir)
+    
+    @benchmark
+    def retrieve_persist(self, prompt, persist_dir, retrieval_config={}):
+        vectorstore, bm25Index = self.retriever.load(persist_dir)
+        return self.retrieve(prompt, vectorstore, bm25Index, retrieval_config)
+    
+    def retrieve(self, prompt, vectorstore, bm25Index, retrieval_config={}):
+        return self.retriever.retrieve(prompt, vectorstore, bm25Index, retrieval_config)
 
+    @benchmark
     def generate(self, prompt):
         return self.generator.generate(prompt)
-
-    def generate_rag(self, prompt, retrieval_config=None):
-        if retrieval_config:
-            params = {"persist_dir", "topk", "score_threshold"}
-            filtered_config = {param: val for param, val in retrieval_config.items() if param in params}
-            retrieved_docs = self.retriever.retrieve(prompt, **filtered_config) 
-        else: retrieved_docs = self.retriever.retrieve(prompt)
-        if not retrieved_docs:
-            return self.generator.generate(prompt), retrieved_docs
+        
+    @benchmark
+    def generate_rag(self, prompt, documents):
+        if not documents:
+            return self.generator.generate(prompt), []
 
         rag_prompt = config_yaml["generation"]["prompts"].get("rag_prompt", None)
-        retrieval_text = rag_prompt + ".\n" + " ".join(doc.page_content for doc in retrieved_docs)
-        return self.generator.generate(retrieval_text + "\n" + prompt), retrieved_docs
+        retrieval_text = rag_prompt + ".\n" + "\n".join(f"Document {i+1}: {doc.page_content}" for i, doc in enumerate(documents))
+        return self.generator.generate(retrieval_text + "\n" + prompt), documents
     
-    def generate_kgrag(self, prompt, retrieval_config=None):
-        if retrieval_config:
-            params = {"persist_dir", "topk", "score_threshold"}
-            filtered_config = {param: val for param, val in retrieval_config.items() if param in params}
-            retrieved_docs = self.retriever.retrieve(prompt, **filtered_config) 
-        else: retrieved_docs = self.retriever.retrieve(prompt)
-        if not retrieved_docs:
-            return self.generator.generate(prompt), retrieved_docs
+    def generate_rag_persist(self, prompt, persist_dir=None, retrieval_config={}):
+        documents = self.retrieve_persist(prompt, persist_dir, retrieval_config)
+        return self.generate_rag(prompt, documents)
+            
 
-        rag_prompt = config_yaml["generation"]["prompts"].get("rag_prompt", None)
-        retrieval_text = rag_prompt + ".\n" + " ".join(doc.page_content for doc in retrieved_docs)
-        return self.generator.generate(retrieval_text + "\n" + prompt), retrieved_docs
+    
+        
+    '''
+    {"id": "2hop__460946_294723", "predicted_answer": "Jennifer Garner", "predicted_support_idxs": [0, 10], "predicted_answerable": true}
+    '''
+    def generate_to_file_with_facts(self, id, generationFunc, filePath):
+        answer,docs = generationFunc()
+        with open(filePath, 'a+') as outfile:
+            predObj = {
+                'id': id,
+                'predicted_answer': answer,
+                'predicted_support_idxs': [],
+                'predicted_answerable': True
+            }
+            outfile.write(json.dumps(predObj) + "\n")
+    
+    
+    
+    
     
     def generate_triples(self, text):
         named_entities_prompt = config_yaml["generation"]["prompts"].get("ner", None)
@@ -72,12 +90,7 @@ class RAGAgent:
         # triples_ner_prompt = config_yaml["generation"]["prompts"].get("ner_triples", None)
         # triples_prompt = config_yaml["generation"]["prompts"].get("triples", None)
         # return self.generator.generate(triples_prompt + "\n" + text)
-        
-    def coreference_resolution(self, text):
-        coref_resolution_prompt = config_yaml["generation"]["prompts"].get("coreference_resolution", None)
-        return self.generator.generate(coref_resolution_prompt + "\n" + text)
-    
-    
+    # ONLY FOR TESTING - TO BE REMOVED
     def get_similarity(self, text1, text2):
         return self.retriever.get_similarity(text1, text2)
     
