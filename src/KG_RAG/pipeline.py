@@ -37,8 +37,7 @@ class RAGAgent:
     
     @benchmark
     def retrieve_persist(self, prompt, persist_dir, retrieval_config={}):
-        vectorstore, bm25Index = self.retriever.load(persist_dir)
-        return self.retrieve(prompt, vectorstore, bm25Index, retrieval_config)
+        return self.retriever.retrieve_persist(prompt, persist_dir, retrieval_config)
     
     def retrieve(self, prompt, vectorstore, bm25Index, retrieval_config={}):
         return self.retriever.retrieve(prompt, vectorstore, bm25Index, retrieval_config)

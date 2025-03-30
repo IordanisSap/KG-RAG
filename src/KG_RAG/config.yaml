@@ -3,7 +3,7 @@ ingestion:
   persist-dir: examples/example1/retrieval_store
   bm25-dir: bm25
   vectorstore-dir: vectorstore
-  # dataset-dir: examples/datasets/MarineRestorationAnalysis # To index a new dataset
+  separate-filetypes: true
 
 retrieval:
   topk: 5
@@ -13,6 +13,7 @@ retrieval:
   persist-dir: examples/example1/retrieval_store
   bm25-dir: bm25
   vectorstore-dir: vectorstore
+  separate-filetypes: true
 
 
 

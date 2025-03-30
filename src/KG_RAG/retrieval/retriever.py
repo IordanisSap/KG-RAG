@@ -27,19 +27,38 @@ class Retriever:
     def retrieve_persist(self, prompt: str, persist_dir=None, retrieval_config={}):
         if persist_dir is None:
             persist_dir = self.config["persist-dir"]
-           
-        vectorstore_dir = os.path.join(persist_dir, self.config["vectorstore-dir"])
-        vectorstore = Chroma(                                                                                            # DB is reloaded every time to be up to date and allow
-            persist_directory=vectorstore_dir, embedding_function=OllamaEmbeddings(model=self.config["embedding-model"]))  # for custom directory. TODO Improve it in the future
-    
-        bm25_dir = os.path.join(persist_dir, self.config["bm25-dir"])
-        bm25Index = self.bm25Retriever.load(bm25_dir)
         
-        return self.retrieve(prompt, vectorstore, bm25Index, retrieval_config)
+        if self.config['separate-filetypes']:
+            extensions = retrieval_config.get("extensions", ['pdf','csv'])
+            num_different_ext = len(extensions)
+            topk = retrieval_config.get('topk', self.config["topk"])
+            topk_each_ext = distribute_k_across_num(topk, num_different_ext)
+            print(topk_each_ext)
+            documents = []
+            for i, ext in enumerate(extensions):
+                vectorstore_dir = os.path.join(persist_dir, ext, self.config["vectorstore-dir"])
+                vectorstore = Chroma(                                                                                            # DB is reloaded every time to be up to date and allow
+                    persist_directory=vectorstore_dir, embedding_function=OllamaEmbeddings(model=self.config["embedding-model"]))  # for custom directory. TODO Improve it in the future
+            
+                bm25_dir = os.path.join(persist_dir, ext, self.config["bm25-dir"])
+                bm25Index = self.bm25Retriever.load(bm25_dir)
+                retrieval_config["topk"] = topk_each_ext[i]
+                documents.extend(self.retrieve(prompt, vectorstore, bm25Index, retrieval_config))
+            return documents
+        else:
+            vectorstore_dir = os.path.join(persist_dir, self.config["vectorstore-dir"])
+            vectorstore = Chroma(                                                                                            # DB is reloaded every time to be up to date and allow
+                persist_directory=vectorstore_dir, embedding_function=OllamaEmbeddings(model=self.config["embedding-model"]))  # for custom directory. TODO Improve it in the future
+        
+            bm25_dir = os.path.join(persist_dir, self.config["bm25-dir"])
+            bm25Index = self.bm25Retriever.load(bm25_dir)
+            
+            return self.retrieve(prompt, vectorstore, bm25Index, retrieval_config)
     
     
     def retrieve(self, prompt: str, vectorstore, bm25Index, retrieval_config={}):
         topk = retrieval_config.get('topk', self.config["topk"])
+        print(retrieval_config)
         score_threshold = retrieval_config.get('score_threshold',self.config["score-threshold"])
         
         vector_retriever = vectorstore.as_retriever(
@@ -64,3 +83,7 @@ class Retriever:
 
         return similarity
         
+def distribute_k_across_num(k, num):
+    base = k // num
+    remainder = k % num
+    return [base + 1 if i < remainder else base for i in range(num)]

@@ -18,10 +18,20 @@ class Ingestor:
         
     @benchmark
     def ingest_documents(self, dataset_dir: str, persist_dir: str):
-        documents = self.data_loader.load(dataset_dir)
-        for doc in documents:
-            doc.metadata["id"] = doc.metadata.get("source", "")
-        return self.ingest(documents, persist_dir)
+        supported_ext = ['pdf', 'csv']
+        if self.config['separate-filetypes']:
+            vectorstores = []
+            for ext in supported_ext:
+                documents = self.data_loader.load(dataset_dir, [ext])
+                for doc in documents:
+                    doc.metadata["id"] = doc.metadata.get("source", "")
+                vectorstores.append(self.ingest(documents, os.path.join(persist_dir,ext)))
+            return vectorstores
+        else:
+            documents = self.data_loader.load(dataset_dir)
+            for doc in documents:
+                doc.metadata["id"] = doc.metadata.get("source", "")
+            return self.ingest(documents, persist_dir)
     
     """
     :param text_chunks: {'id':..., 'text':...}

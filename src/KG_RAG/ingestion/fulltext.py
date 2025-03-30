@@ -10,7 +10,7 @@ class BM25Indexer:
         self.stemmer = Stemmer.Stemmer("english")
     
     def index(self, documents: List[Document], persist_dir):
-        corpus_records = [ ({"id": doc.metadata["id"], "text": doc.page_content}) for doc in documents]
+        corpus_records = [ ({"id": doc.metadata["id"], "source": doc.metadata["source"], "page":  doc.metadata.get("page",0), "row":  doc.metadata.get("row",0), "text": doc.page_content}) for doc in documents]
         corpus_lst = [ r["text"] for r in corpus_records]      
         corpus_tokens = bm25s.tokenize(corpus_lst, stopwords="en", stemmer=self.stemmer)
         retriever = bm25s.BM25(corpus=corpus_records)

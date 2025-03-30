@@ -5,6 +5,9 @@ from concurrent.futures import ThreadPoolExecutor
 import logging
 from langchain_community.document_loaders.csv_loader import CSVLoader
 import csv
+from typing import List
+
+
 from KG_RAG.utils import benchmark
 
 class DataLoader:
@@ -17,12 +20,15 @@ class DataLoader:
         }
 
     @benchmark
-    def load(self, dir_path: str):
+    def load(self, dir_path: str, extensions: List[str] = []):
         dir_path = Path(dir_path)
         if not dir_path.exists() or not dir_path.is_dir():
             raise ValueError(f"Provided path '{dir_path}' is not a valid directory.")
 
-        files = {ext: list(dir_path.glob(f"*.{ext}")) for ext in self.loaders}
+        if len(extensions) == 0:
+            files = {ext: list(dir_path.glob(f"*.{ext}")) for ext in self.loaders}
+        else:
+            files = {ext: list(dir_path.glob(f"*.{ext}")) for ext in extensions}
         files_to_load = [(file, ext) for ext, file_list in files.items() for file in file_list]
 
         if not files_to_load:

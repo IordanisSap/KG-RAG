@@ -17,7 +17,7 @@ class BM25Retriever:
 
         return [
             Document(result["text"], metadata={
-                    "source": "BM25 - NO URL", "page": "1", "id": result["id"]})
+                    "source": result["source"], "page": result["page"], "id": result["id"]})
             for result, score in zip(results[0, :], scores[0, :]) if score > 1
         ]
 
