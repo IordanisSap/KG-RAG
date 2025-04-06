@@ -11,13 +11,13 @@ class BM25Retriever:
 
     def retrieve(self, query, index):
         query_tokens = bm25s.tokenize(query, stemmer=self.stemmer)
-        results, scores = index.retrieve(query_tokens, k=5)
+        results, scores = index.retrieve(query_tokens, k=self.config.get('candidate-pool-size', 5))
         for i in range(results.shape[1]):
             doc, score = results[0, i], scores[0, i]
 
         return [
             Document(result["text"], metadata={
-                    "source": result["source"], "page": result["page"], "id": result["id"]})
+                    "source": result.get("source", result["id"]), "page": result.get("page",0), "row": result.get("row",0), "id": result["id"]})
             for result, score in zip(results[0, :], scores[0, :]) if score > 1
         ]
 

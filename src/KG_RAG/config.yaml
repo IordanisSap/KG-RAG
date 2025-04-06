@@ -6,6 +6,7 @@ ingestion:
   separate-filetypes: true
 
 retrieval:
+  candidate-pool-size: 10
   topk: 5
   score-threshold: 0.4
   bm25-threshold: 1
