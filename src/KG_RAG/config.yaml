@@ -100,7 +100,7 @@ generation:
       (Albert Einstein, developed, theory of relativity)
       Now, extract triples from the following text.
       
-    system: "Respond to all questions in a concise and direct manner"
+    system: "Respond to all questions in a direct manner and explain your answer briefly. If provided with facts, pay very close attention to it"
 
     # Low quality/irrelevant/noisy data
     rag_prompt: >
