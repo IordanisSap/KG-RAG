@@ -25,7 +25,8 @@ class Ingestor:
                 documents = self.data_loader.load(dataset_dir, [ext])
                 for doc in documents:
                     doc.metadata["id"] = doc.metadata.get("source", "")
-                vectorstores.append(self.ingest(documents, os.path.join(persist_dir,ext)))
+                if len(documents) > 0:
+                    vectorstores.append(self.ingest(documents, os.path.join(persist_dir,ext)))
             return vectorstores
         else:
             documents = self.data_loader.load(dataset_dir)

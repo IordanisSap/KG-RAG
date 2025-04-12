@@ -34,18 +34,17 @@ class Retriever:
         
         if self.config['separate-filetypes']:
             extensions = retrieval_config.get("extensions", ['pdf','csv'])
-            num_different_ext = len(extensions)
             topk = retrieval_config.get('topk', self.config["topk"])
             documents = []
             for i, ext in enumerate(extensions):
                 vectorstore_dir = os.path.join(persist_dir, ext, self.config["vectorstore-dir"])
+                if not os.path.isdir(vectorstore_dir): continue
                 vectorstore = Chroma(                                                                                            # DB is reloaded every time to be up to date and allow
                     persist_directory=vectorstore_dir, embedding_function=OllamaEmbeddings(model=self.config["embedding-model"]))  # for custom directory. TODO Improve it in the future
             
                 bm25_dir = os.path.join(persist_dir, ext, self.config["bm25-dir"])
                 bm25Index = self.bm25Retriever.load(bm25_dir)
                 documents.extend(self.retrieve(prompt, vectorstore, bm25Index, retrieval_config))
-                print(vars(documents[0]))
             return rerank_documents(documents, prompt, OllamaEmbeddings(model=self.config["embedding-model"]))[:topk]
         else:
             vectorstore_dir = os.path.join(persist_dir, self.config["vectorstore-dir"])
