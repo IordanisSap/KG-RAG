@@ -53,13 +53,8 @@ class DataLoader:
 
 # Todo: Automatically detect if header exists
 def load_csv_with_auto_header(file_path):
-    with open(file_path, "r", newline="", encoding="utf-8") as f:
-        # sample = f.read(1024)
-        # sniffer = csv.Sniffer()
-        # has_header = sniffer.has_header(sample) #TODO Implement this in a better way, currently it is buggy and doesnt work due to quotes
-        has_header = True
-        
     csv_args = {}
+    has_header = True
     if (not has_header):
         with open(file_path, "r", newline="", encoding="utf-8") as f:
             reader = csv.reader(f)
