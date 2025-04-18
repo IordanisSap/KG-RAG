@@ -1,0 +1,12 @@
+retrieval:
+  topk: 6
+  score-threshold: 0.6
+  persist-dir: /mnt/10TB/iordanissapidis/SemanticRAG/retrieval_store/FAO-GRSF
+
+generation:
+  prompts:
+    system: "Respond to all questions in a direct manner and with as few words as possible. Do not explain your answer at all. Pay very close attention to provided facts"
+
+    rag_prompt: >
+      Examine all the provided data carefully and answer according to the given data. 
+      You are given the following data:

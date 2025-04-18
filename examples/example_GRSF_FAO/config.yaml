@@ -1,0 +1,6 @@
+ingestion:
+  persist-dir: /home/iordanissapidis/KG-RAG/examples/example_GRSF_FAO/persist
+
+retrieval:
+  persist-dir: /home/iordanissapidis/KG-RAG/examples/example_GRSF_FAO/persist
+  topk: 3

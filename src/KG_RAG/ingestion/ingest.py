@@ -38,7 +38,7 @@ class Ingestor:
     :param text_chunks: {'id':..., 'text':...}
     """
     def ingest_text(self, text_chunks: Iterable[str], persist_dir: str):
-        documents = [Document(chunk["text"], metadata={"id": chunk["id"]}) for chunk in text_chunks]
+        documents = [Document(chunk["text"], metadata={"id": chunk["id"], "source": chunk["id"]}) for chunk in text_chunks]
         return self.ingest(documents, persist_dir)
         
     @benchmark

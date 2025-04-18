@@ -1,0 +1,7 @@
+ingestion:
+  persist-dir: /home/iordanissapidis/KG-RAG/examples/example_GRSF/persist
+
+retrieval:
+  persist-dir: /home/iordanissapidis/KG-RAG/examples/example_GRSF/persist
+  topk: 15
+  score-threshold: 0.63
