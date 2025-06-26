@@ -10,7 +10,6 @@ class Splitter:
     @benchmark
     def split_documents(self, docs):
         chunks = self.text_splitter.split_documents(docs)  # Process all docs at once
-        print(len(chunks))
         return chunks
 
 

@@ -75,10 +75,7 @@ class RAGAgent:
                 'predicted_answerable': True
             }
             outfile.write(json.dumps(predObj) + "\n")
-    
-    
-    
-    
+
     
     def generate_triples(self, text):
         named_entities_prompt = config_yaml["generation"]["prompts"].get("ner", None)
@@ -89,9 +86,6 @@ class RAGAgent:
         # triples_ner_prompt = config_yaml["generation"]["prompts"].get("ner_triples", None)
         # triples_prompt = config_yaml["generation"]["prompts"].get("triples", None)
         # return self.generator.generate(triples_prompt + "\n" + text)
-    # ONLY FOR TESTING - TO BE REMOVED
-    def get_similarity(self, text1, text2):
-        return self.retriever.get_similarity(text1, text2)
     
         
 

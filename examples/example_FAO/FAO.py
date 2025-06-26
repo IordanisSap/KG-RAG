@@ -14,5 +14,8 @@ agent = RAGAgent(config_yaml)
 
 # agent.index_documents(dataset_path, store_path)
 
-res, docs = agent.generate_rag_persist("One sentence about palm trees?")
-print(res, f" (Retrieved documents: {len(docs)})")
+res, docs = agent.generate_rag_persist("fish")
+for doc in docs:
+    print(doc.page_content + "\n")
+
+# print(res, f" (Retrieved documents: {len(docs)})")
