@@ -38,6 +38,10 @@ class Retriever:
         if persist_dir is None:
             persist_dir = self.config["persist-dir"]
 
+        topk = retrieval_config.get('topk', self.config["topk"])
+        score_threshold = retrieval_config.get(
+            'score_threshold', self.config["score-threshold"])
+
         if self.config['separate-filetypes']:
             extensions = retrieval_config.get("extensions", ['pdf', 'csv'])
             topk = retrieval_config.get('topk', self.config["topk"])
@@ -56,7 +60,8 @@ class Retriever:
                 bm25Index = self.bm25Retriever.load(bm25_dir)
                 documents[ext] = self.retrieve(
                     prompt, vectorstore, bm25Index, retrieval_config)
-            return merge_docs(prompt, documents)[:topk]
+            merged_docs = merge_docs(documents)
+            return rerank_docs(prompt, merged_docs, topk, score_threshold)
         else:
             vectorstore_dir = os.path.join(
                 persist_dir, self.config["vectorstore-dir"])
@@ -67,12 +72,12 @@ class Retriever:
             bm25_dir = os.path.join(persist_dir, self.config["bm25-dir"])
             bm25Index = self.bm25Retriever.load(bm25_dir)
 
-            return self.retrieve(prompt, vectorstore, bm25Index, retrieval_config, True)
+            return rerank_docs(prompt, self.retrieve(prompt, vectorstore, bm25Index, retrieval_config, True), topk, score_threshold)
 
     def retrieve(self, prompt: str, vectorstore, bm25Index, retrieval_config={}):
         candidate_pool_size = retrieval_config.get(
             'candidate-pool-size', self.config["candidate-pool-size"])
-        topk = retrieval_config.get('topk', self.config["topk"])
+        
         score_threshold = retrieval_config.get(
             'score_threshold', self.config["score-threshold"])
 
@@ -84,7 +89,7 @@ class Retriever:
             :candidate_pool_size]
         documents["DPR"] = vector_retriever.invoke(prompt)
         # get_relevant_documents
-        return merge_docs(prompt, documents)[:topk]
+        return merge_docs(documents)
 
     def get_similarity(self, text1, text2):
         embeddings_model = OllamaEmbeddings(
@@ -102,31 +107,41 @@ class Retriever:
 
 
 @benchmark
-def merge_docs(query, docsExtDict):
+def merge_docs(docsDict):
     merged_docs = []
-    for key, docs in docsExtDict.items():
+    for key, docs in docsDict.items():
         merged_docs.extend(docs)
 
+    if len(merged_docs) == 0:
+        return []
     # Filter duplicate docs
     unique_merged_docs = []
     seen_combinations = set()
     for doc in merged_docs:
         source = doc.metadata.get("source")
-        page = doc.metadata.get("page")
-        uniqueness_key = (doc.page_content, source, page)
+        # page = doc.metadata.get("page")
+        uniqueness_key = (doc.page_content, source)
 
         if uniqueness_key not in seen_combinations:
             unique_merged_docs.append(doc)
             seen_combinations.add(uniqueness_key)
 
+    return unique_merged_docs
 
-    hf_ce = HuggingFaceCrossEncoder(model_name="cross-encoder/ms-marco-MiniLM-L-6-v2")
 
-    reranker = CrossEncoderReranker(model=hf_ce)
+def rerank_docs(query, docs, topk, score_threshold=0):
+    hf_ce = HuggingFaceCrossEncoder(model_name="cross-encoder/stsb-TinyBERT-L4")
+
+    reranker = CrossEncoderReranker(model=hf_ce, top_n=topk)
 
     final_docs = reranker.compress_documents(
-        documents=unique_merged_docs,
+        documents=docs,
         query=query,
     )
 
-    return final_docs
+    final_docs_threshold = [doc for doc in final_docs if hf_ce.score([(query, doc.page_content)])[0] > score_threshold] 
+    # final_docs_scored = [(doc, hf_ce.score([(query, doc.page_content)])) for doc in final_docs]
+
+    
+
+    return final_docs_threshold
