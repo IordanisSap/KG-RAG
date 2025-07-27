@@ -5,7 +5,7 @@ from langchain_core.messages import HumanMessage, SystemMessage
 class Generator:
     def __init__(self, config):
         self.config = config
-        self.model = OllamaLLM(model=config["model"])
+        self.model = OllamaLLM(model=config["model"], num_ctx=4096)
         self.model.temperature = config["temperature"]
         self.system_message = config["prompts"].get("system", None)
         
