@@ -127,9 +127,9 @@ def merge_docs(docsDict):
 
     return unique_merged_docs
 
-
+@benchmark
 def rerank_docs(query, docs, topk, score_threshold=0):
-    hf_ce = HuggingFaceCrossEncoder(model_name="cross-encoder/stsb-roberta-base")
+    hf_ce = HuggingFaceCrossEncoder(model_name="Alibaba-NLP/gte-reranker-modernbert-base")
 
     reranker = CrossEncoderReranker(model=hf_ce, top_n=topk)
 
@@ -137,8 +137,13 @@ def rerank_docs(query, docs, topk, score_threshold=0):
         documents=docs,
         query=query,
     )
+    max_score = hf_ce.score([(query, docs[0].page_content)])[0]
+    min_score = hf_ce.score([(query, docs[-1].page_content)])[0]
 
-    final_docs_threshold = [doc for doc in final_docs if hf_ce.score([(query, doc.page_content)])[0] > score_threshold] 
+    def normalize_score(score):
+        return (score-min_score)/(max_score-min_score)
+
+    final_docs_threshold = [doc for doc in final_docs if normalize_score(hf_ce.score([(query, doc.page_content)])[0]) >= score_threshold] 
     final_docs_scored = [(doc, hf_ce.score([(query, doc.page_content)])) for doc in final_docs]
 
     

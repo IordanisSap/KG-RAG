@@ -59,8 +59,6 @@ class RAGAgent:
         documents = self.retrieve_persist(prompt, persist_dir, retrieval_config)
         return self.generate_rag(prompt, documents)
             
-
-    
         
     '''
     {"id": "2hop__460946_294723", "predicted_answer": "Jennifer Garner", "predicted_support_idxs": [0, 10], "predicted_answerable": true}
