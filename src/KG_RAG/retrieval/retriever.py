@@ -103,9 +103,8 @@ class Retriever:
 
         return similarity
 
+
 # Merge and rerank
-
-
 @benchmark
 def merge_docs(docsDict):
     merged_docs = []
@@ -130,7 +129,7 @@ def merge_docs(docsDict):
 
 
 def rerank_docs(query, docs, topk, score_threshold=0):
-    hf_ce = HuggingFaceCrossEncoder(model_name="cross-encoder/stsb-TinyBERT-L4")
+    hf_ce = HuggingFaceCrossEncoder(model_name="cross-encoder/stsb-roberta-base")
 
     reranker = CrossEncoderReranker(model=hf_ce, top_n=topk)
 
@@ -140,7 +139,7 @@ def rerank_docs(query, docs, topk, score_threshold=0):
     )
 
     final_docs_threshold = [doc for doc in final_docs if hf_ce.score([(query, doc.page_content)])[0] > score_threshold] 
-    # final_docs_scored = [(doc, hf_ce.score([(query, doc.page_content)])) for doc in final_docs]
+    final_docs_scored = [(doc, hf_ce.score([(query, doc.page_content)])) for doc in final_docs]
 
     
 

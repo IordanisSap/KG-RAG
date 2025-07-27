@@ -2,5 +2,5 @@ ingestion:
   persist-dir: /home/iordanissapidis/KG-RAG/examples/example_GRSF_FAO/persist
 
 retrieval:
-  persist-dir: /home/iordanissapidis/KG-RAG/examples/example_GRSF_FAO/persist
-  topk: 3
+  persist-dir: /mnt/10TB/iordanissapidis/SemanticRAG/retrieval_store/FAO-GRSF
+  topk: 5
