@@ -9,35 +9,6 @@ generation:
   prompts:
     system: "Respond to all questions directly without any explanation"
 
-    # rag_prompt: >
-    #   Examine all the provided data carefully and answer only according to that data.
-    #   Identify the entity in the question and ignore all data not directly mentioning that entity.  
-    #   You must not use your implicit knowledge to answer the question. 
-    #   Respond with a single word, name, or date—*only the exact answer required by the question*.
-    #   Pay very close attention especially to the first provided documents (Document 1, Document 2 etc.)
-    #   There is always an answer in the first document, which is Document 1.
-    #   IMPORTANT: Never answer with 'None', even if you cant find the answer, answer with an entity of the first document.
-    #   Do not include additional details such as dates, descriptions, or extra context.
-    #   In your answer you are only allowed to use words,names and dates that exist in the provided documents.
-    #   If multiple answers are needed, separate them using the character | (e.g., X | Y | Z).
-
-
-    # rag_prompt: >
-    #   Answer the question using only information from the provided documents.
-
-    #   Steps:
-    #   1. Find the entity mentioned in the question
-    #   2. Look through all documents for information about that entity
-    #   3. Extract the exact answer (word, name, or date only)
-    #   4. If multiple answers are present, separate with | (e.g., X | Y | Z)
-
-    #   Rules:
-    #   - Use only words, names, and dates that appear in the documents
-    #   - Give the shortest possible answer
-    #   - Focus especially on Documents 1-3 as they are most relevant
-    #   - If uncertain between options, choose from the earliest document
-
-
     rag_prompt: >
       Your task is to extract the answer from the documents. There is always relevant information present.
 
@@ -49,6 +20,19 @@ generation:
       Never respond with "None" - always extract something relevant from the text.
 
       If multiple answers are present, separate with | (e.g., X | Y | Z)
+
+    kgrag_prompt: >
+      Your task is to extract the answer from the documents. There is always relevant information present.
+
+      Find the entity mentioned in the question, then extract the specific information requested about that entity from the documents.
+
+      Answer with only the exact word, name, or date needed.
+      Use only text that appears in the documents.
+
+      Never respond with "None" - always extract something relevant from the text.
+
+      If multiple answers are present, separate with | (e.g., X | Y | Z)
+
 
 
   
