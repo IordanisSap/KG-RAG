@@ -17,7 +17,7 @@ agent = RAGAgent(config_yaml)
 # res, docs = agent.generate_rag_persist("Is conservation translocation of tortoises generally recommended?")
 # res, docs = agent.generate_rag_persist("Do giant tortoises live in places with predators?")
 # res, docs = agent.generate_rag_persist("Are there currently tigers in Bali?")
-res, docs = agent.generate_rag_persist("Is the freshwater sculpin protected by the EU Habitats Directive?")
+res, docs = agent.generate_kgrag_persist("Is the freshwater sculpin protected by the EU Habitats Directive?")
 
 
 

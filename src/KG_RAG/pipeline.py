@@ -47,17 +47,25 @@ class RAGAgent:
         return self.generator.generate(prompt)
         
     @benchmark
-    def generate_rag(self, prompt, documents):
+    def generate_rag(self, question, rag_prompt, documents):
         if not documents:
-            return self.generator.generate(prompt), []
+            return self.generator.generate(question), []
 
         rag_prompt = config_yaml["generation"]["prompts"].get("rag_prompt", None)
-        retrieval_text = rag_prompt + ".\n" + "\n".join(f"Document {i+1}: {doc.page_content}" for i, doc in enumerate(documents))
-        return self.generator.generate(retrieval_text + "\n" + prompt), documents
+        retrieval_text = rag_prompt + ".\n Snippets \n " + "\n ".join(f"Snippet {i+1}: {doc.page_content}" for i, doc in enumerate(documents))
+        return self.generator.generate(retrieval_text + "\n Question: \n" + question), documents
     
     def generate_rag_persist(self, prompt, persist_dir=None, retrieval_config={}):
         documents = self.retrieve_persist(prompt, persist_dir, retrieval_config)
-        return self.generate_rag(prompt, documents)
+        rag_prompt = config_yaml["generation"]["prompts"].get("rag_prompt", None)
+        return self.generate_rag(prompt, rag_prompt, documents)
+    
+    def generate_kgrag_persist(self, prompt, persist_dir=None, retrieval_config={}):
+        documents = self.retrieve_persist(prompt, persist_dir, retrieval_config)
+        print(prompt, persist_dir, retrieval_config)
+        rag_prompt = config_yaml["generation"]["prompts"].get("kgrag_prompt", None)
+        print(rag_prompt)
+        return self.generate_rag(prompt, rag_prompt, documents)
             
         
     '''

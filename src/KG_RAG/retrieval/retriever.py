@@ -4,7 +4,7 @@ from langchain_chroma import Chroma
 from langchain_ollama import OllamaEmbeddings
 from langchain_community.cross_encoders import HuggingFaceCrossEncoder
 from langchain.retrievers.document_compressors import CrossEncoderReranker
-
+import torch
 from sklearn.metrics.pairwise import cosine_similarity
 
 
@@ -73,7 +73,7 @@ class Retriever:
             bm25Index = self.bm25Retriever.load(bm25_dir)
 
             return rerank_docs(prompt, self.retrieve(prompt, vectorstore, bm25Index, retrieval_config, True), topk, score_threshold)
-
+    @benchmark
     def retrieve(self, prompt: str, vectorstore, bm25Index, retrieval_config={}):
         candidate_pool_size = retrieval_config.get(
             'candidate-pool-size', self.config["candidate-pool-size"])
@@ -87,6 +87,7 @@ class Retriever:
         documents = {}
         documents["BM25"] = self.bm25Retriever.retrieve(prompt, bm25Index)[
             :candidate_pool_size]
+        
         documents["DPR"] = vector_retriever.invoke(prompt)
         # get_relevant_documents
         return merge_docs(documents)
@@ -127,25 +128,43 @@ def merge_docs(docsDict):
 
     return unique_merged_docs
 
+
+hf_ce = HuggingFaceCrossEncoder(
+    model_name="Alibaba-NLP/gte-reranker-modernbert-base",
+    model_kwargs={
+        "automodel_args": {
+            "torch_dtype": torch.float32,          # force fp32
+            "attn_implementation": "eager",        # avoid FlashAttention path
+        },
+        "trust_remote_code": True,                 # often required for ModernBERT
+        # "device": "cuda"  # or "cpu" if you want to force CPU
+    },
+)
+
 @benchmark
 def rerank_docs(query, docs, topk, score_threshold=0):
-    hf_ce = HuggingFaceCrossEncoder(model_name="Alibaba-NLP/gte-reranker-modernbert-base")
-
-    reranker = CrossEncoderReranker(model=hf_ce, top_n=topk)
-
-    final_docs = reranker.compress_documents(
-        documents=docs,
-        query=query,
-    )
-    max_score = hf_ce.score([(query, docs[0].page_content)])[0]
-    min_score = hf_ce.score([(query, docs[-1].page_content)])[0]
-
-    def normalize_score(score):
-        return (score-min_score)/(max_score-min_score)
-
-    final_docs_threshold = [doc for doc in final_docs if normalize_score(hf_ce.score([(query, doc.page_content)])[0]) >= score_threshold] 
-    final_docs_scored = [(doc, hf_ce.score([(query, doc.page_content)])) for doc in final_docs]
-
+    if len(docs) == 0:
+        return []
     
-
+    texts = [(query, doc.page_content) for doc in docs]
+    scores = hf_ce.score(texts)
+    
+    doc_score_pairs = list(zip(docs, scores))
+    doc_score_pairs.sort(key=lambda x: x[1], reverse=True)
+    
+    doc_score_pairs = doc_score_pairs[:topk]
+    
+    final_docs = [doc for doc, score in doc_score_pairs]
+    
+    max_score = doc_score_pairs[0][1]
+    min_score = doc_score_pairs[-1][1]
+    
+    def normalize_score(score):
+        return (score - min_score) / (max_score - min_score) if max_score != min_score else 1.0
+    
+    final_docs_threshold = [doc for doc, score in doc_score_pairs 
+                           if normalize_score(score) >= score_threshold]
+    
+    final_docs_scored = [(doc, score) for doc, score in doc_score_pairs]
+    
     return final_docs_threshold

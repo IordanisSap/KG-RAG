@@ -1,0 +1,75 @@
+Indexing --> 1538 seconds (25.6 minutes)
+
+llama - verbalized
+Final Scores:
+Accuracy (top-1 match):                   0.8892
+Exact Match (unordered full match):       0.6057
+Macro Precision:                          0.7749
+Macro Recall:                             0.9219
+Macro F1:                                 0.8094
+Micro Precision:                          0.6762
+Micro Recall:                             0.8123
+Micro F1:                                 0.7380
+
+
+llama - verbalized2
+Final Scores:
+Accuracy (top-1 match):                   0.8897
+Exact Match (unordered full match):       0.5924
+Macro Precision:                          0.7680
+Macro Recall:                             0.9223
+Macro F1:                                 0.8047
+Micro Precision:                          0.6713
+Micro Recall:                             0.8135
+Micro F1:                                 0.7356
+
+
+non-verb-lamma
+Final Scores:
+Accuracy (top-1 match):                   0.8892
+Exact Match (unordered full match):       0.6044
+Macro Precision:                          0.7781
+Macro Recall:                             0.9215
+Macro F1:                                 0.8119
+Micro Precision:                          0.6849
+Micro Recall:                             0.8173
+Micro F1:                                 0.7453
+
+
+
+gemma - verbalized
+Final Scores:
+Accuracy (top-1 match):                   0.8993
+Exact Match (unordered full match):       0.7150
+Macro Precision:                          0.8454
+Macro Recall:                             0.9216
+Macro F1:                                 0.8586
+Micro Precision:                          0.7648
+Micro Recall:                             0.8071
+Micro F1:                                 0.7854
+
+gemma - verbalized2
+Final Scores:
+Accuracy (top-1 match):                   0.8952
+Exact Match (unordered full match):       0.7241
+Macro Precision:                          0.8504
+Macro Recall:                             0.9207
+Macro F1:                                 0.8619
+Micro Precision:                          0.7734
+Micro Recall:                             0.8074
+Micro F1:                                 0.7900
+
+
+non-verb-gemma
+Final Scores:
+Accuracy (top-1 match):                   0.9044
+Exact Match (unordered full match):       0.7510
+Macro Precision:                          0.8671
+Macro Recall:                             0.9257
+Macro F1:                                 0.8753
+Micro Precision:                          0.7915
+Micro Recall:                             0.8130
+Micro F1:                                 0.8021
+
+
+

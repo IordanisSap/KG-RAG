@@ -1,18 +1,24 @@
-from langchain_ollama import OllamaLLM
-from langchain_core.messages import HumanMessage, SystemMessage
-
+import ollama
 
 class Generator:
     def __init__(self, config):
         self.config = config
-        self.model = OllamaLLM(model=config["model"], num_ctx=4096)
-        self.model.temperature = config["temperature"]
+        self.model_name = config["model"]
+        self.temperature = config["temperature"]
         self.system_message = config["prompts"].get("system", None)
-        
+
     def generate(self, prompt):
         messages = [
-            SystemMessage(self.config["prompts"].get("system", None)),
-            HumanMessage(prompt)
+            {"role": "system", "content": self.system_message},
+            {"role": "user", "content": prompt}
         ]
-        response = self.model.invoke(messages)
-        return response
+        response = ollama.chat(
+            model=self.model_name,
+            messages=messages,
+            options={
+                "temperature": self.temperature,
+                "num_ctx": 8192,
+                "num_predict": 500
+            }
+        )
+        return response['message']['content']
