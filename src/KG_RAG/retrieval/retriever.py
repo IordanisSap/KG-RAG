@@ -73,7 +73,7 @@ class Retriever:
             bm25Index = self.bm25Retriever.load(bm25_dir)
 
             return rerank_docs(prompt, self.retrieve(prompt, vectorstore, bm25Index, retrieval_config, True), topk, score_threshold)
-    @benchmark
+
     def retrieve(self, prompt: str, vectorstore, bm25Index, retrieval_config={}):
         candidate_pool_size = retrieval_config.get(
             'candidate-pool-size', self.config["candidate-pool-size"])

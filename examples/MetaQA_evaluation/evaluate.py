@@ -19,7 +19,7 @@ def prf1(gold_set, pred_set):
     return p, r, f1, tp
 
 gold_path = os.path.join(os.path.dirname(__file__), '1-hop', 'qa_test.txt')
-pred_path = os.path.join(os.path.dirname(__file__), '1-hop_pred', 'pred-verbalized2-llama.txt')
+pred_path = os.path.join(os.path.dirname(__file__), '1-hop_pred', 'pred-non-verbalized-gemma.txt')
 
 total_tp = total_pred = total_gold = 0
 macro_f1s = []

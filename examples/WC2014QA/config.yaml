@@ -29,4 +29,4 @@ generation:
 
   
   # model: gemma3:12b
-  temperature: 0.05
+  temperature: 0

@@ -40,7 +40,7 @@ class RAGAgent:
         return self.retriever.retrieve_persist(prompt, persist_dir, retrieval_config)
     
     def retrieve(self, prompt, vectorstore, bm25Index, retrieval_config={}):
-        return self.retriever.retrieve(prompt, vectorstore, bm25Index, retrieval_config, True)
+        return self.retriever.retrieve(prompt, vectorstore, bm25Index, retrieval_config)
 
     @benchmark
     def generate(self, prompt):
@@ -62,9 +62,7 @@ class RAGAgent:
     
     def generate_kgrag_persist(self, prompt, persist_dir=None, retrieval_config={}):
         documents = self.retrieve_persist(prompt, persist_dir, retrieval_config)
-        print(prompt, persist_dir, retrieval_config)
         rag_prompt = config_yaml["generation"]["prompts"].get("kgrag_prompt", None)
-        print(rag_prompt)
         return self.generate_rag(prompt, rag_prompt, documents)
             
         
